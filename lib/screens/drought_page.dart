@@ -108,7 +108,7 @@ class _DroughtPageState extends State<DroughtPage> {
                 print(marker);
               }
             },
-            child: Text("Add"),
+            child: const Text("Add"),
           ),
         ],
       ),
