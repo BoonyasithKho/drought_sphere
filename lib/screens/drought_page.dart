@@ -111,7 +111,7 @@ class _DroughtPageState extends State<DroughtPage> {
                   name: 'Click',
                   onMessageReceived: (message) {
                     markerSet = (message.message).replaceAll('\$', '');
-                    print(markerSet);
+                    // print(markerSet);
                     MarkerModel tutorial = MarkerModel.fromJson(jsonDecode(markerSet));
 
                     ln = tutorial.data!.lon!;
@@ -146,70 +146,75 @@ class _DroughtPageState extends State<DroughtPage> {
                     );
                     if (marker != null) {
                       map.currentState?.call("Overlays.add", args: [marker]);
-                      print(marker);
+                      // print(marker);
                     }
                   },
                 ),
               ],
             ),
           ),
-          OutlinedButton(
-            onPressed: isDrawEnabled
-                ? () async {
-                    print(markerBoundary);
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              OutlinedButton(
+                onPressed: isDrawEnabled
+                    ? () async {
+                        // print(markerBoundary);
 
-                    var polygon = map.currentState?.SphereObject(
-                      "Polygon",
-                      args: [
-                        markerBoundary,
-                      ],
-                      // args: [
-                      //   [
-                      //     {
-                      //       "lon": 100.12664927734653,
-                      //       "lat": 13.635917731768345,
-                      //     },
-                      //     {
-                      //       "lon": 99.84100474609693,
-                      //       "lat": 14.238368273568753,
-                      //     },
-                      //     {
-                      //       "lon": 100.9231580664084,
-                      //       "lat": 14.323542874048258,
-                      //     },
-                      //     {
-                      //       "lon": 101.04950083984647,
-                      //       "lat": 13.710642513710113,
-                      //     }
-                      //   ]
-                      // ],
-                    );
-                    if (polygon != null && pointCount >= 3) {
-                      map.currentState?.call("Overlays.add", args: [polygon]);
-                      print(polygon);
-                      setState(() {
-                        isDrawEnabled = false;
-                        isClearEnabled = true;
-                      });
-                    }
-                  }
-                : null,
-            child: const Text("Draw Polygon"),
-          ),
-          OutlinedButton(
-            onPressed: isClearEnabled
-                ? () {
-                    markerBoundary.clear();
-                    pointCount = 0;
+                        var polygon = map.currentState?.SphereObject(
+                          "Polygon",
+                          args: [
+                            markerBoundary,
+                          ],
+                          // args: [
+                          //   [
+                          //     {
+                          //       "lon": 100.12664927734653,
+                          //       "lat": 13.635917731768345,
+                          //     },
+                          //     {
+                          //       "lon": 99.84100474609693,
+                          //       "lat": 14.238368273568753,
+                          //     },
+                          //     {
+                          //       "lon": 100.9231580664084,
+                          //       "lat": 14.323542874048258,
+                          //     },
+                          //     {
+                          //       "lon": 101.04950083984647,
+                          //       "lat": 13.710642513710113,
+                          //     }
+                          //   ]
+                          // ],
+                        );
+                        if (polygon != null && pointCount >= 3) {
+                          map.currentState?.call("Overlays.add", args: [polygon]);
+                          // print(polygon);
+                          setState(() {
+                            isDrawEnabled = false;
+                            isClearEnabled = true;
+                          });
+                        }
+                      }
+                    : null,
+                child: const Text("Draw Polygon"),
+              ),
+              OutlinedButton(
+                onPressed: isClearEnabled
+                    ? () {
+                        markerBoundary.clear();
+                        pointCount = 0;
 
-                    map.currentState?.call("Overlays.clear");
-                    setState(() {
-                      isDrawEnabled = false;
-                      isClearEnabled = false;
-                    });
-                  }
-                : null,
-            child: Text('Clear'),
+                        map.currentState?.call("Overlays.clear");
+                        setState(() {
+                          isDrawEnabled = false;
+                          isClearEnabled = false;
+                        });
+                      }
+                    : null,
+                child: Text('Clear'),
+              ),
+            ],
           ),
         ],
       ),
