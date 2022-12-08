@@ -2,7 +2,6 @@ import 'package:drought_sphere/screens/drought_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/drought_page_fluttermap.dart';
 import 'screens/landing_page.dart';
 import 'utils/my_constant.dart';
 import 'utils/my_theme.dart';
@@ -10,7 +9,6 @@ import 'utils/my_theme.dart';
 final Map<String, WidgetBuilder> mapRoute = {
   '/landingPage': (context) => const LandingPage(),
   '/droughtPage': (context) => const DroughtPage(),
-  '/droughtFlutterMap': (context) => const DrougtFlutterMap(),
 };
 
 void main(List<String> args) {

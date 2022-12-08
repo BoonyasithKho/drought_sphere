@@ -8,7 +8,6 @@ class MyConstant {
 
   static String routeLanding = '/landingPage';
   static String routhDrought = '/droughtPage';
-  static String routhDroughtFlutterMap = '/droughtFlutterMap';
 
   static Color primary = const Color(0xff87861d);
   static Color dark = const Color(0xff575900);
