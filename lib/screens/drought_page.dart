@@ -159,33 +159,13 @@ class _DroughtPageState extends State<DroughtPage> {
               OutlinedButton(
                 onPressed: isDrawEnabled
                     ? () async {
-                        // print(markerBoundary);
+                        print(markerBoundary);
 
                         var polygon = map.currentState?.SphereObject(
                           "Polygon",
                           args: [
                             markerBoundary,
                           ],
-                          // args: [
-                          //   [
-                          //     {
-                          //       "lon": 100.12664927734653,
-                          //       "lat": 13.635917731768345,
-                          //     },
-                          //     {
-                          //       "lon": 99.84100474609693,
-                          //       "lat": 14.238368273568753,
-                          //     },
-                          //     {
-                          //       "lon": 100.9231580664084,
-                          //       "lat": 14.323542874048258,
-                          //     },
-                          //     {
-                          //       "lon": 101.04950083984647,
-                          //       "lat": 13.710642513710113,
-                          //     }
-                          //   ]
-                          // ],
                         );
                         if (polygon != null && pointCount >= 3) {
                           map.currentState?.call("Overlays.add", args: [polygon]);
@@ -214,6 +194,12 @@ class _DroughtPageState extends State<DroughtPage> {
                     : null,
                 child: Text('Clear'),
               ),
+              OutlinedButton(
+                onPressed: () {
+                  pointCount < 3 ? print('minimum 3 points') : print(markerBoundary);
+                },
+                child: Text('Get Data'),
+              )
             ],
           ),
         ],
