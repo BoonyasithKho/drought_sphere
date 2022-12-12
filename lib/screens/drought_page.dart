@@ -100,62 +100,58 @@ class _DroughtPageState extends State<DroughtPage> {
       ),
       body: Stack(
         children: [
-          Expanded(
-            flex: 2,
-            child: SphereMapWidget(
-              key: sphere,
-              apiKey: "test2022",
-              bundleId: "",
-              eventName: [
-                JavascriptChannel(
-                  name: 'Ready',
-                  onMessageReceived: (message) {
-                    sphere.currentState?.call("Ui.LayerSelector.visible", args: [false]);
-                    // sphere.currentState?.call("Ui.DPad.visible", args: [false]);
-                  },
-                ),
-                JavascriptChannel(
-                  name: 'Click',
-                  onMessageReceived: (message) {
-                    markerSet = (message.message).replaceAll('\$', '');
-                    // print(markerSet);
-                    MarkerModel tutorial = MarkerModel.fromJson(jsonDecode(markerSet));
+          SphereMapWidget(
+            key: sphere,
+            apiKey: "test2022",
+            bundleId: "",
+            eventName: [
+              JavascriptChannel(
+                name: 'Ready',
+                onMessageReceived: (_) {
+                  sphere.currentState?.call("Ui.LayerSelector.visible", args: [false]);
+                  // sphere.currentState?.call("Ui.DPad.visible", args: [false]);
+                },
+              ),
+              JavascriptChannel(
+                name: 'Click',
+                onMessageReceived: (message) {
+                  markerSet = (message.message).replaceAll('\$', '');
+                  MarkerModel tutorial = MarkerModel.fromJson(jsonDecode(markerSet));
 
-                    ln = tutorial.data!.lon!;
-                    lt = tutorial.data!.lat!;
+                  ln = tutorial.data!.lon!;
+                  lt = tutorial.data!.lat!;
 
-                    // int numberSeq = Random().nextInt(10000);
-                    // print(numberSeq);s
+                  // int numberSeq = Random().nextInt(10000);
+                  // print(numberSeq);s
 
-                    pointCount = pointCount + 1;
-                    if (pointCount >= 3) {
-                      setState(() {
-                        isDrawEnabled = true;
-                      });
-                    }
-                    markerBoundary.add({
-                      "lon": ln,
-                      "lat": lt,
+                  pointCount = pointCount + 1;
+                  if (pointCount >= 3) {
+                    setState(() {
+                      isDrawEnabled = true;
                     });
+                  }
+                  markerBoundary.add({
+                    "lon": ln,
+                    "lat": lt,
+                  });
 
-                    var marker = Sphere.SphereObject(
-                      "Marker",
-                      // id: 'point${numberSeq.toString()}',
-                      args: [
-                        {
-                          "lon": ln,
-                          "lat": lt,
-                        },
-                        {
-                          "draggable": true,
-                        },
-                      ],
-                    );
-                    sphere.currentState?.call("Overlays.add", args: [marker]);
-                  },
-                ),
-              ],
-            ),
+                  var marker = Sphere.SphereObject(
+                    "Marker",
+                    // id: 'point${numberSeq.toString()}',
+                    args: [
+                      {
+                        "lon": ln,
+                        "lat": lt,
+                      },
+                      {
+                        "draggable": true,
+                      },
+                    ],
+                  );
+                  sphere.currentState?.call("Overlays.add", args: [marker]);
+                },
+              ),
+            ],
           ),
           Positioned(
             top: 20,
