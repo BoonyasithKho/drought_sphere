@@ -9,7 +9,6 @@ import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 import 'package:sphere_maps_flutter/sphere_maps_flutter.dart';
-import 'package:latlong2/latlong.dart' as latLng;
 import '../utils/my_dialog.dart';
 
 class DroughtPage extends StatefulWidget {
@@ -121,9 +120,6 @@ class _DroughtPageState extends State<DroughtPage> {
                   ln = tutorial.data!.lon!;
                   lt = tutorial.data!.lat!;
 
-                  // int numberSeq = Random().nextInt(10000);
-                  // print(numberSeq);s
-
                   pointCount = pointCount + 1;
                   if (pointCount >= 3) {
                     setState(() {
@@ -137,7 +133,6 @@ class _DroughtPageState extends State<DroughtPage> {
 
                   var marker = Sphere.SphereObject(
                     "Marker",
-                    // id: 'point${numberSeq.toString()}',
                     args: [
                       {
                         "lon": ln,
@@ -145,6 +140,7 @@ class _DroughtPageState extends State<DroughtPage> {
                       },
                       {
                         "draggable": true,
+                        "zindex": 999,
                       },
                     ],
                   );
