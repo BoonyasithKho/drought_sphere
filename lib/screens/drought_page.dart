@@ -5,6 +5,7 @@ import 'package:drought_sphere/model/marker_model.dart';
 import 'package:drought_sphere/utils/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:map_picker/map_picker.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
@@ -31,6 +32,9 @@ class _DroughtPageState extends State<DroughtPage> {
   bool isClearEnabled = false;
   int visit = 0;
   bool mapZoom = false;
+
+  // Map Picker
+  MapPickerController mapPickerController = MapPickerController();
 
   // //-- map location
   // late CenterOnLocationUpdate _centerOnLocationUpdate;
@@ -93,123 +97,22 @@ class _DroughtPageState extends State<DroughtPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Polygon Sphere'),
       ),
       body: Stack(
         children: [
-          SphereMapWidget(
-            key: sphere,
-            apiKey: "test2022",
-            bundleId: "",
-            eventName: [
-              JavascriptChannel(
-                name: 'Ready',
-                onMessageReceived: (_) {
-                  sphere.currentState?.call("Ui.LayerSelector.visible", args: [false]);
-                  // sphere.currentState?.call("Ui.DPad.visible", args: [false]);
-                },
-              ),
-              JavascriptChannel(
-                name: 'Click',
-                onMessageReceived: (message) {
-                  markerSet = (message.message).replaceAll('\$', '');
-                  MarkerModel tutorial = MarkerModel.fromJson(jsonDecode(markerSet));
-
-                  ln = tutorial.data!.lon!;
-                  lt = tutorial.data!.lat!;
-
-                  pointCount = pointCount + 1;
-                  if (pointCount >= 3) {
-                    setState(() {
-                      isDrawEnabled = true;
-                    });
-                  }
-                  markerBoundary.add({
-                    "lon": ln,
-                    "lat": lt,
-                  });
-
-                  var marker = Sphere.SphereObject(
-                    "Marker",
-                    args: [
-                      {
-                        "lon": ln,
-                        "lat": lt,
-                      },
-                      {
-                        "draggable": true,
-                        "zindex": 999,
-                      },
-                    ],
-                  );
-                  sphere.currentState?.call("Overlays.add", args: [marker]);
-                },
-              ),
-            ],
+          MapPicker(
+            mapPickerController: mapPickerController,
+            iconWidget: const Icon(Icons.location_on_rounded),
+            showDot: true,
+            child: ShpereMaps(),
           ),
-          Positioned(
-            top: 20,
-            right: 20,
-            child: Container(
-              child: FloatingActionButton.small(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                onPressed: () {
-                  Dialogs.bottomMaterialDialog(
-                    msg: 'Are you sure? you can\'t undo this action',
-                    title: 'Delete',
-                    context: context,
-                    color: Colors.black,
-                    actions: [
-                      IconsOutlineButton(
-                        onPressed: () {
-                          markerBoundary.clear();
-                          pointCount = 0;
-                          sphere.currentState?.call("Overlays.clear");
-                          setState(() {
-                            isDrawEnabled = false;
-                            isClearEnabled = false;
-                          });
-                          Navigator.of(context).pop();
-                        },
-                        text: 'Clear',
-                        iconData: Icons.cancel_outlined,
-                        textStyle: TextStyle(color: Colors.grey),
-                        iconColor: Colors.grey,
-                      ),
-                      IconsButton(
-                        onPressed: () {
-                          var polygon = Sphere.SphereObject(
-                            "Polygon",
-                            args: [
-                              markerBoundary,
-                            ],
-                          );
-                          if (pointCount >= 3) {
-                            sphere.currentState?.call("Overlays.add", args: [polygon]);
-                            Navigator.of(context).pop();
-                            setState(() {
-                              isDrawEnabled = false;
-                              isClearEnabled = true;
-                            });
-                          }
-                        },
-                        text: 'Draw',
-                        iconData: Icons.delete,
-                        color: Colors.red,
-                        textStyle: TextStyle(color: Colors.white),
-                        iconColor: Colors.white,
-                      ),
-                    ],
-                  );
-                },
-                child: Icon(
-                  Icons.layers_rounded,
-                  color: Theme.of(context).iconTheme.color,
-                ),
-              ),
-            ),
+          BaseMapLayers(
+            context,
           ),
         ],
       ),
@@ -251,23 +154,156 @@ class _DroughtPageState extends State<DroughtPage> {
         mini: true,
         child: const Icon(Icons.location_searching_sharp),
       ),
-      bottomNavigationBar: BottomBarFloating(
-        items: const [
-          TabItem(icon: Icons.rice_bowl_rounded, title: 'ข้าว'),
-          TabItem(icon: Icons.filter_frames_rounded, title: 'ข้าวโพด'),
-          TabItem(icon: Icons.home, title: ''),
-          TabItem(icon: Icons.dining_sharp, title: 'มันสำปะหลัง'),
-          TabItem(icon: Icons.dinner_dining_rounded, title: 'อ้อย'),
-        ],
-        backgroundColor: Colors.blue,
-        color: Colors.white,
-        colorSelected: Colors.black38,
-        indexSelected: visit,
-        paddingVertical: 24,
-        onTap: (int index) => setState(() {
+      bottomNavigationBar: BottomBar(context),
+    );
+  }
+
+  BottomBarFloating BottomBar(BuildContext context) {
+    return BottomBarFloating(
+      items: const [
+        TabItem(icon: Icons.numbers, title: 'Simple'),
+        TabItem(icon: Icons.numbers, title: 'Traffic'),
+        TabItem(icon: Icons.home, title: ''),
+        TabItem(icon: Icons.numbers, title: 'Satellite'),
+        TabItem(icon: Icons.numbers, title: 'Hybrid'),
+      ],
+      backgroundColor: Theme.of(context).primaryColor,
+      color: Theme.of(context).iconTheme.color!,
+      colorSelected: Colors.black38,
+      indexSelected: visit,
+      paddingVertical: 24,
+      onTap: (index) {
+        print(index);
+        setState(() {
           visit = index;
-        }),
+        });
+        // final trafficBaseMap = sphere.currentState?.SphereStatic("Layers", "TRAFFIC");
+        // if (visit == 1) {
+        //   if (trafficBaseMap != null) {
+        //   sphere.currentState?.call(
+        //     "Layers.add",
+        //     args: [trafficBaseMap],
+        //   );
+        // }
+      },
+    );
+  }
+
+  Positioned BaseMapLayers(BuildContext context) {
+    return Positioned(
+      top: 20,
+      right: 20,
+      child: Container(
+        child: FloatingActionButton.small(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          onPressed: () {
+            Dialogs.bottomMaterialDialog(
+              msg: 'Are you sure? you can\'t undo this action',
+              title: 'Delete',
+              context: context,
+              color: Colors.black,
+              actions: [
+                IconsOutlineButton(
+                  onPressed: () {
+                    markerBoundary.clear();
+                    pointCount = 0;
+                    sphere.currentState?.call("Overlays.clear");
+                    setState(() {
+                      isDrawEnabled = false;
+                      isClearEnabled = false;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  text: 'Clear',
+                  iconData: Icons.cancel_outlined,
+                  textStyle: TextStyle(color: Colors.grey),
+                  iconColor: Colors.grey,
+                ),
+                IconsButton(
+                  onPressed: () {
+                    var polygon = Sphere.SphereObject(
+                      "Polygon",
+                      args: [
+                        markerBoundary,
+                      ],
+                    );
+                    if (pointCount >= 3) {
+                      sphere.currentState?.call("Overlays.add", args: [polygon]);
+                      Navigator.of(context).pop();
+                      setState(() {
+                        isDrawEnabled = false;
+                        isClearEnabled = true;
+                      });
+                    }
+                  },
+                  text: 'Draw',
+                  iconData: Icons.delete,
+                  color: Colors.red,
+                  textStyle: TextStyle(color: Colors.white),
+                  iconColor: Colors.white,
+                ),
+              ],
+            );
+          },
+          child: Icon(
+            Icons.layers_rounded,
+            color: Theme.of(context).iconTheme.color,
+          ),
+        ),
       ),
+    );
+  }
+
+  SphereMapWidget ShpereMaps() {
+    return SphereMapWidget(
+      key: sphere,
+      apiKey: "test2022",
+      bundleId: "",
+      eventName: [
+        JavascriptChannel(
+          name: 'Ready',
+          onMessageReceived: (_) {
+            sphere.currentState?.call("Ui.LayerSelector.visible", args: [false]);
+            // sphere.currentState?.call("Ui.DPad.visible", args: [false]);
+          },
+        ),
+        JavascriptChannel(
+          name: 'Click',
+          onMessageReceived: (message) {
+            markerSet = (message.message).replaceAll('\$', '');
+            MarkerModel tutorial = MarkerModel.fromJson(jsonDecode(markerSet));
+
+            ln = tutorial.data!.lon!;
+            lt = tutorial.data!.lat!;
+
+            pointCount = pointCount + 1;
+            if (pointCount >= 3) {
+              setState(() {
+                isDrawEnabled = true;
+              });
+            }
+            markerBoundary.add({
+              "lon": ln,
+              "lat": lt,
+            });
+
+            var marker = Sphere.SphereObject(
+              "Marker",
+              args: [
+                {
+                  "lon": ln,
+                  "lat": lt,
+                },
+                {
+                  "draggable": true,
+                  "zindex": 999,
+                },
+              ],
+            );
+            sphere.currentState?.call("Overlays.add", args: [marker]);
+          },
+        ),
+      ],
     );
   }
 }

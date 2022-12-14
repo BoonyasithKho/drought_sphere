@@ -41,6 +41,7 @@ dependencies:
   latlong2: ^0.8.1
   awesome_bottom_bar: any
   material_dialogs: any
+  map_picker: ^0.0.3
 
 
 dev_dependencies:
