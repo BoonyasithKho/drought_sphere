@@ -36,6 +36,12 @@ class _DroughtPageState extends State<DroughtPage> {
   // Map Picker
   MapPickerController mapPickerController = MapPickerController();
 
+  // Base Map Layer
+  final simpleBaseMap = Sphere.SphereStatic("Layers", "SIMPLE");
+  final trafficBaseMap = Sphere.SphereStatic("Layers", "TRAFFIC");
+  final sateliteBaseMap = Sphere.SphereStatic("Layers", "IMAGES");
+  final hybridBaseMap = Sphere.SphereStatic("Layers", "HYBRID");
+
   // //-- map location
   // late CenterOnLocationUpdate _centerOnLocationUpdate;
   // late StreamController<double> _centerCurrentLocationStreamController;
@@ -177,13 +183,53 @@ class _DroughtPageState extends State<DroughtPage> {
         setState(() {
           visit = index;
         });
-        final trafficBaseMap = Sphere.SphereStatic("Layers", "TRAFFIC");
-        if (visit == 1) {
-          if (trafficBaseMap != null) {
-          sphere.currentState?.call(
-            "Layers.add",
-            args: [trafficBaseMap],
-          );
+
+        switch (visit) {
+          case 0:
+            sphere.currentState?.call(
+              "Layers.clear",
+            );
+            sphere.currentState?.call(
+              "Layers.add",
+              args: [simpleBaseMap],
+            );
+            break;
+          case 1:
+            sphere.currentState?.call(
+              "Layers.clear",
+            );
+            sphere.currentState?.call(
+              "Layers.add",
+              args: [trafficBaseMap],
+            );
+            break;
+          case 2:
+            sphere.currentState?.call(
+              "Layers.clear",
+            );
+            break;
+          case 3:
+            sphere.currentState?.call(
+              "Layers.clear",
+            );
+            sphere.currentState?.call(
+              "Layers.add",
+              args: [sateliteBaseMap],
+            );
+            break;
+          case 4:
+            sphere.currentState?.call(
+              "Layers.clear",
+            );
+            sphere.currentState?.call(
+              "Layers.add",
+              args: [hybridBaseMap],
+            );
+            break;
+          default:
+            sphere.currentState?.call(
+              "Layers.clear",
+            );
         }
       },
     );
@@ -293,10 +339,6 @@ class _DroughtPageState extends State<DroughtPage> {
                 {
                   "lon": ln,
                   "lat": lt,
-                },
-                {
-                  "draggable": true,
-                  "zindex": 999,
                 },
               ],
             );
