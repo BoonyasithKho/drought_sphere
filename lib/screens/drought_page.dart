@@ -177,14 +177,14 @@ class _DroughtPageState extends State<DroughtPage> {
         setState(() {
           visit = index;
         });
-        // final trafficBaseMap = sphere.currentState?.SphereStatic("Layers", "TRAFFIC");
-        // if (visit == 1) {
-        //   if (trafficBaseMap != null) {
-        //   sphere.currentState?.call(
-        //     "Layers.add",
-        //     args: [trafficBaseMap],
-        //   );
-        // }
+        final trafficBaseMap = Sphere.SphereStatic("Layers", "TRAFFIC");
+        if (visit == 1) {
+          if (trafficBaseMap != null) {
+          sphere.currentState?.call(
+            "Layers.add",
+            args: [trafficBaseMap],
+          );
+        }
       },
     );
   }
